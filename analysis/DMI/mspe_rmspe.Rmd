@@ -1,0 +1,207 @@
+
+
+```{r}
+squared_prediction_errors_exact = function(seed_fold_results, mean_ANI){
+  squared_error = c()
+  predictions_temp = c()
+  observations_temp = c()
+  # seed_fold_results[1,10]
+  predictions_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "predictions")])
+  observations_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "observations")])
+  error_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "Squared prediction errors")])
+  for (i in c(1:length(error_seeds))) {
+    squared_error = append(squared_error, as.numeric(error_seeds[i][[1]]))
+  }
+  for (i in c(1:length(predictions_seeds))) {
+  predictions_temp = append(predictions_temp, as.numeric(predictions_seeds[i][[1]]))
+  }
+  for (i in c(1:length(observations_seeds))) {
+  observations_temp = append(observations_temp, as.numeric(observations_seeds[i][[1]]))
+}
+  
+  # mspe = mean(squared_error)
+  mspe = mean((predictions_temp - observations_temp)^2)
+  mae = mean(abs(predictions_temp - observations_temp))
+  rmspe = sqrt(mspe)
+  rmr = 100*rmspe / mean_ANI
+  library(epiR)
+  tmp.ccc <- epi.ccc(x = observations_temp , y =predictions_temp , ci = "z-transform", conf.level = 0.95, rep.measure = FALSE)
+  tmp.ccc$rho.c[,1]
+ 
+
+  return(c(mspe, rmspe, rmr, mae, tmp.ccc$rho.c[,1]))
+}
+```
+
+
+
+# Glmmlasso
+```{r}
+load("./1/ANI_glmmlasso.RData")
+mean_ANI = mean(candidate_data$CH4)
+glmmlasso_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmmlasso_res
+
+data.frame("glmmlasso" = glmmlasso_res)
+
+
+
+load("./1/ANI_glmmlasso_log.RData")
+
+mean_ANI = mean(candidate_data$CH4)
+
+glmmlasso_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmmlasso_log_res
+
+
+
+```
+
+# Glmnet
+```{r}
+load("./1/ANI_glmnet.RData")
+
+mean_ANI = mean(candidate_data$CH4)
+glmnet_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmnet_res
+
+
+load("./1/ANI_glmnet_log.RData")
+mean_ANI = mean(candidate_data$CH4)
+glmnet_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmnet_log_res
+```
+# SCAD
+```{r}
+load("./1/ANI_SCAD.RData")
+mean_ANI = mean(candidate_data$CH4)
+scad_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+scad_res
+
+load("./1/ANI_SCAD_log.RData")
+mean_ANI = mean(candidate_data$CH4)
+scad_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+scad_log_res
+```
+
+# Traditional
+```{r}
+load("./1/Traditional.RData")
+mean_ANI = mean(candidate_data$CH4)
+colnames(seed_fold_results)[7] = "Squared prediction errors"
+trad_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+trad_res
+
+
+```
+```{r}
+squared_prediction_errors_exact_rf = function(seed_fold_results, mean_ANI){
+  squared_error = c()
+  predictions_temp = c()
+  observations_temp = c()
+  # seed_fold_results[1,10]
+  predictions_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "predictions_rf")])
+  observations_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "observations_rf")])
+  error_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "Squared prediction errors_rf")])
+  for (i in c(1:length(error_seeds))) {
+    squared_error = append(squared_error, as.numeric(error_seeds[i][[1]]))
+  }
+  for (i in c(1:length(predictions_seeds))) {
+  predictions_temp = append(predictions_temp, as.numeric(predictions_seeds[i][[1]]))
+  }
+  for (i in c(1:length(observations_seeds))) {
+  observations_temp = append(observations_temp, as.numeric(observations_seeds[i][[1]]))
+}
+  
+  mspe = mean(squared_error)
+  rmspe = sqrt(mspe)
+  rmr = 100*rmspe / mean_ANI
+  library(epiR)
+  tmp.ccc <- epi.ccc(x = observations_temp , y =predictions_temp , ci = "z-transform", conf.level = 0.95, rep.measure = FALSE)
+  tmp.ccc$rho.c[,1]
+ mae = mean(abs(predictions_temp - observations_temp))
+
+  return(c(mspe, rmspe, rmr, mae, tmp.ccc$rho.c[,1]))
+}
+
+squared_prediction_errors_exact_gbm = function(seed_fold_results, mean_ANI){
+  squared_error = c()
+  predictions_temp = c()
+  observations_temp = c()
+  # seed_fold_results[1,10]
+  predictions_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "predictions_gbm")])
+  observations_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "observations_gbm")])
+  error_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "Squared prediction errors_gbm")])
+  for (i in c(1:length(error_seeds))) {
+    squared_error = append(squared_error, as.numeric(error_seeds[i][[1]]))
+  }
+  for (i in c(1:length(predictions_seeds))) {
+  predictions_temp = append(predictions_temp, as.numeric(predictions_seeds[i][[1]]))
+  }
+  for (i in c(1:length(observations_seeds))) {
+  observations_temp = append(observations_temp, as.numeric(observations_seeds[i][[1]]))
+}
+  
+  mspe = mean(squared_error)
+  rmspe = sqrt(mspe)
+  rmr = 100*rmspe / mean_ANI
+  library(epiR)
+  tmp.ccc <- epi.ccc(x = observations_temp , y =predictions_temp , ci = "z-transform", conf.level = 0.95, rep.measure = FALSE)
+  tmp.ccc$rho.c[,1]
+ 
+ mae = mean(abs(predictions_temp - observations_temp))
+
+  return(c(mspe, rmspe, rmr, mae, tmp.ccc$rho.c[,1]))
+}
+```
+
+
+
+# Tree
+```{r}
+load("./1/ANI_tree.RData")
+mean_ANI = mean(candidate_data$CH4)
+# colnames(seed_fold_results)[7] = "Squared prediction errors"
+tree_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+tree_res
+tree_res_rf = squared_prediction_errors_exact_rf(seed_fold_results, mean_ANI)
+tree_res_rf
+
+tree_res_gbm = squared_prediction_errors_exact_gbm(seed_fold_results, mean_ANI)
+tree_res_gbm
+
+load("./1/ANI_tree_log.RData")
+mean_ANI = mean(candidate_data$CH4)
+tree_res_log = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+tree_res_log
+tree_res_rf_log = squared_prediction_errors_exact_rf(seed_fold_results, mean_ANI)
+tree_res_rf_log
+
+tree_res_gbm_log = squared_prediction_errors_exact_gbm(seed_fold_results, mean_ANI)
+tree_res_gbm_log
+
+```
+
+
+
+```{r}
+df1 = data.frame("glmmlasso" = glmmlasso_res, "glmmlasso_log" = glmmlasso_log_res,
+           "glmnet" = glmnet_res, "glmnet_log" = glmnet_log_res,
+           "scad" = scad_res, "scad_log" = scad_log_res,
+           "tradtional" = trad_res, "RDF_Boosting" = tree_res, "RDF_Boosting_log" = tree_res_log,
+           "RDF" = tree_res_rf, "RDF_log" = tree_res_rf_log,
+           "Boosting" = tree_res_gbm, "Boosting_log" = tree_res_gbm_log)
+rownames(df1) = c("MSPE", "RMSPE", "RMR","MAE","CCC")
+
+
+df2 = df1[, order(df1[1,])]
+df2
+round(df2,3)
+
+write.csv(round(df2,3), "200_split_res.csv")
+```
+
+
+
+
+

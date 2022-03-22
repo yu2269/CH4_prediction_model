@@ -1,0 +1,98 @@
+
+
+```{r}
+squared_prediction_errors_exact = function(seed_fold_results, mean_ANI){
+  squared_error = c()
+  error_seeds = as.array(seed_fold_results[,which(colnames(seed_fold_results) == "Squared prediction errors")])
+  for (i in c(1:length(error_seeds))) {
+    squared_error = append(squared_error, as.numeric(error_seeds[i][[1]]))
+  }
+  
+  mspe = mean(squared_error)
+  rmspe = sqrt(mspe)
+  rmr = 100*rmspe / mean_ANI
+ 
+
+  return(c(mspe, rmspe, rmr))
+}
+```
+
+
+
+# Glmmlasso
+```{r}
+load("./1/ANI_glmmlasso.RData")
+mean_ANI = mean(candidate_data$CH4)
+glmmlasso_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmmlasso_res
+
+data.frame("glmmlasso" = glmmlasso_res)
+
+
+
+load("./1/ANI_glmmlasso_log.RData")
+
+mean_ANI = mean(candidate_data$CH4)
+
+glmmlasso_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmmlasso_log_res
+
+
+
+```
+
+# Glmnet
+```{r}
+load("./1/ANI_glmnet.RData")
+
+mean_ANI = mean(candidate_data$CH4)
+glmnet_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmnet_res
+
+
+load("./1/ANI_glmnet_log.RData")
+mean_ANI = mean(candidate_data$CH4)
+glmnet_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmnet_log_res
+```
+# SCAD
+```{r}
+load("./1/ANI_SCAD.RData")
+mean_ANI = mean(candidate_data$CH4)
+scad_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+scad_res
+
+load("./1/ANI_SCAD_log.RData")
+mean_ANI = mean(candidate_data$CH4)
+scad_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+scad_log_res
+```
+
+# Traditional
+```{r}
+load("./1/Traditional.RData")
+mean_ANI = mean(candidate_data$CH4)
+colnames(seed_fold_results)[7] = "Squared prediction errors"
+trad_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+trad_res
+
+
+```
+
+```{r}
+df1 = data.frame("glmmlasso" = glmmlasso_res, "glmmlasso_log" = glmmlasso_log_res,
+           "glmnet" = glmnet_res, "glmnet_log" = glmnet_log_res,
+           "scad" = scad_res, "scad_log" = scad_log_res,
+           "tradtional" = trad_res)
+rownames(df1) = c("MSPE", "RMSPE", "RMR")
+
+
+df2 = df1[, order(df1[1,])]
+df2
+round(df2,3)
+```
+
+
+
+
+

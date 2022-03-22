@@ -1,0 +1,116 @@
+
+
+```{r}
+squared_prediction_errors_exact = function(seed_fold_results, mean_ANI){
+
+  
+  mspe_res = as.numeric(seed_fold_results[,which(colnames(seed_fold_results) == "MSPE")])
+
+ 
+
+  return(mspe_res)
+}
+```
+
+
+
+# Glmmlasso
+```{r}
+load("./1/ANI_glmmlasso.RData")
+mean_ANI = mean(candidate_data$CH4)
+glmmlasso_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmmlasso_res
+
+data.frame("glmmlasso" = glmmlasso_res)
+
+
+
+load("./1/ANI_glmmlasso_log.RData")
+
+mean_ANI = mean(candidate_data$CH4)
+
+glmmlasso_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmmlasso_log_res
+data.frame("glmmlasso" = glmmlasso_res, "glmmlasso_log" = glmmlasso_log_res)
+
+
+```
+
+# Glmnet
+```{r}
+load("./1/ANI_glmnet.RData")
+
+mean_ANI = mean(candidate_data$CH4)
+glmnet_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmnet_res
+
+
+load("./1/ANI_glmnet_log.RData")
+mean_ANI = mean(candidate_data$CH4)
+glmnet_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+glmnet_log_res
+```
+# SCAD
+```{r}
+load("./1/ANI_SCAD.RData")
+mean_ANI = mean(candidate_data$CH4)
+scad_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+scad_res
+
+load("./1/ANI_SCAD_log.RData")
+mean_ANI = mean(candidate_data$CH4)
+scad_log_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+scad_log_res
+```
+
+# Traditional
+```{r}
+load("./1/Traditional.RData")
+mean_ANI = mean(candidate_data$CH4)
+trad_res = squared_prediction_errors_exact(seed_fold_results, mean_ANI)
+trad_res
+
+
+```
+
+
+
+
+```{r}
+plot_df = data.frame("glmmlasso" = glmmlasso_res, 
+                     "glmnet" = glmnet_res,
+                     "SCAD" = scad_res,
+                     "glmmlasso_log" = glmmlasso_log_res, 
+                     "glmnet_log" = glmnet_log_res,
+                     "SCAD_log" = scad_log_res,
+                     "Traditional" = trad_res)
+
+plot_df_2 = stack(plot_df)
+mean(plot_df_2[plot_df_2$ind == "glmnet", 1])
+
+plot_df_2$ind = reorder(plot_df_2$ind, plot_df_2$values, mean)
+library(ggplot2)
+ggplot(plot_df_2, aes(x = ind, y = values)) +
+  geom_boxplot()+ geom_jitter(shape=16, position=position_jitter(0.2))
+
+
+
+```
+```{r}
+plot_df = data.frame("glmmlasso" = glmmlasso_res-trad_res, 
+                     "glmnet" = glmnet_res-trad_res,
+                     "SCAD" = scad_res-trad_res,
+                     "glmmlasso_log" = glmmlasso_log_res-trad_res, 
+                     "glmnet_log" =glmnet_log_res-trad_res,
+                     "SCAD_log" = scad_log_res-trad_res,
+                     "Traditional" = trad_res-trad_res  )
+
+plot_df_2 = stack(plot_df)
+mean(plot_df_2[plot_df_2$ind == "glmnet", 1])
+
+plot_df_2$ind = reorder(plot_df_2$ind, plot_df_2$values, mean)
+library(ggplot2)
+ggplot(plot_df_2, aes(x = ind, y = values)) +
+  geom_boxplot()+ geom_jitter(shape=16, position=position_jitter(0.2))
+```
+
